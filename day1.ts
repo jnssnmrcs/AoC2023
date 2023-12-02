@@ -1,3 +1,22 @@
+const input = await Deno.readTextFile("day1-input.txt");
+const lines = input.split("\n");
+
+// Part 1
+let answer = lines.reduce((sum, line) => {
+  const numbers = line.match(/\d/g);
+
+  if (!numbers?.length) {
+    return sum;
+  }
+
+  const value = parseInt(numbers[0] + numbers[numbers.length - 1]);
+
+  return sum + value;
+}, 0);
+
+console.log("Day 1 Part 1 answer:", answer);
+
+// Part 2
 const numberMap = new Map([
   ["one", "1"],
   ["two", "2"],
@@ -10,8 +29,7 @@ const numberMap = new Map([
   ["nine", "9"],
 ]);
 
-const input = await Deno.readTextFile("day1-input.txt");
-const answer = input.split("\n").reduce((sum, line) => {
+answer = lines.reduce((sum, line) => {
   const matches = line.matchAll(
     /(?=(\d|one|two|three|four|five|six|seven|eight|nine))/g
   );
