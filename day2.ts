@@ -3,7 +3,7 @@ type Game = {
   rounds: {
     draws: {
       count: number;
-      color: "red" | "green" | "blue";
+      color: 'red' | 'green' | 'blue';
     }[];
   }[];
 };
@@ -20,16 +20,16 @@ export function parseGame(line: string): Game | null {
     rounds: [],
   };
 
-  for (const round of matches[2].split("; ")) {
-    const gameRound: Game["rounds"][0] = {
+  for (const round of matches[2].split('; ')) {
+    const gameRound: Game['rounds'][0] = {
       draws: [],
     };
-    for (const draw of round.split(", ")) {
-      const [count, color] = draw.split(" ");
+    for (const draw of round.split(', ')) {
+      const [count, color] = draw.split(' ');
 
       gameRound.draws.push({
         count: parseInt(count),
-        color: color as "red" | "green" | "blue",
+        color: color as 'red' | 'green' | 'blue',
       });
     }
 
@@ -45,8 +45,8 @@ const cubes = {
   blue: 14,
 };
 
-const input = await Deno.readTextFile("day2-input.txt");
-const lines = input.split("\n");
+const input = await Deno.readTextFile('day2-input.txt');
+const lines = input.split('\n');
 // Part 1
 let answer = lines.reduce((sum, line) => {
   const game = parseGame(line);
@@ -57,7 +57,7 @@ let answer = lines.reduce((sum, line) => {
   return !game || !possible ? sum : sum + game.id;
 }, 0);
 
-console.log("Day 2 Part 1 answer:", answer);
+console.log('Day 2 Part 1 answer:', answer);
 
 // Part 2
 answer = lines.reduce((sum, line) => {
@@ -67,7 +67,7 @@ answer = lines.reduce((sum, line) => {
     return sum;
   }
 
-  const maxCounts: Record<"red" | "green" | "blue", number> = {
+  const maxCounts: Record<'red' | 'green' | 'blue', number> = {
     red: 0,
     green: 0,
     blue: 0,
@@ -86,4 +86,4 @@ answer = lines.reduce((sum, line) => {
   return sum + power;
 }, 0);
 
-console.log("Day 2 Part 2 answer:", answer);
+console.log('Day 2 Part 2 answer:', answer);
