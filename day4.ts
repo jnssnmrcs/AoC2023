@@ -28,50 +28,27 @@ const answer1 = lines.reduce((sum, line) => {
 console.log('Day 4 Part 1 answer:', answer1);
 
 // Part 2
-type Card = {
-  id: number;
-  winningNumbers: number[];
-  myNumbers: number[];
-};
-
-const cardMap = new Map<number, { card: Card; count: number }>();
-
-for (const line of lines) {
+const cardCount = new Map<number, number>();
+const answer2 = lines.reduce((sum, line) => {
   const matches = line.match(/^Card\s+(\d+)\:([\d\s]+)\|([\d\s]+)$/);
 
   if (!matches) {
-    continue;
+    return sum;
   }
 
   const id = parseInt(matches[1]);
-  const winningNumbers = (matches[2].match(/\d+/g) ?? []).map((x) =>
-    parseInt(x)
-  );
-  const myNumbers = (matches[3].match(/\d+/g) ?? []).map((x) => parseInt(x));
-  const card = {
-    id,
-    winningNumbers,
-    myNumbers,
-  };
+  const winningNumbers = matches[2].match(/\d+/g) ?? [];
+  const myNumbers = matches[3].match(/\d+/g) ?? [];
+  const count = cardCount.get(id) ?? 1;
+  const winCount = intersection(winningNumbers, myNumbers).length;
 
-  cardMap.set(id, { card, count: 1 });
-}
-let cardCount = cardMap.size;
+  for (let i = 1; i <= winCount; i++) {
+    const oldCount = cardCount.get(id + i) ?? 1;
 
-for (const [id, { card, count }] of cardMap) {
-  const winningNumbers =
-    intersection(card.winningNumbers, card.myNumbers).length;
-
-  for (let i = 1; i <= winningNumbers; i++) {
-    const old = cardMap.get(id + i);
-
-    if (!old) {
-      break;
-    }
-
-    cardMap.set(old.card.id, { ...old, count: old.count + count });
-    cardCount += count;
+    cardCount.set(id + i, oldCount + count);
   }
-}
 
-console.log('Day 4 Part 2 answer:', cardCount);
+  return sum + count;
+}, 0);
+
+console.log('Day 4 Part 2 answer:', answer2);
