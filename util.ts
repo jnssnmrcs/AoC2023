@@ -3,6 +3,35 @@ export function intersection<T>(a: T[], b: T[]): T[] {
   return [...new Set(a)].filter((x) => setB.has(x));
 }
 
+export type Point = {
+  x: number;
+  y: number;
+};
+
+export function getPointsAround(
+  point: Point,
+  includeDiagonals = false,
+): Point[] {
+  const { x, y } = point;
+  const points = [
+    { x, y: y - 1 },
+    { x, y: y + 1 },
+    { x: x - 1, y },
+    { x: x + 1, y },
+  ];
+
+  if (includeDiagonals) {
+    points.push(
+      { x: x - 1, y: y - 1 },
+      { x: x + 1, y: y + 1 },
+      { x: x - 1, y: y + 1 },
+      { x: x + 1, y: y - 1 },
+    );
+  }
+
+  return points;
+}
+
 export type Range = {
   from: number;
   to: number;

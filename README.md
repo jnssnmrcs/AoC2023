@@ -3,5 +3,5 @@
 ## Run
 
 ```sh
-$ deno run dayX.ts
+$ deno task day X
 ```
