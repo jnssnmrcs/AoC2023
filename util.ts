@@ -93,3 +93,42 @@ export function splitRangeWithRange(a: Range, b: Range): Range[] {
 
   return ranges;
 }
+
+export function unique<T>(array: T[]): T[] {
+  return [...new Set(array)];
+}
+
+export function lcm(...numbers: number[]) {
+  return unique(
+    numbers.reduce<number[]>(
+      (all, number) => [...all, ...primeFactors(number)],
+      [],
+    ),
+  ).reduce((result, prime) => result * prime, 1);
+}
+
+export function primeFactors(number: number) {
+  const factors = [];
+  let divisor = 2;
+
+  while (number >= 2) {
+    if (number % divisor == 0) {
+      factors.push(divisor);
+      number = number / divisor;
+    } else {
+      divisor++;
+    }
+  }
+
+  return factors;
+}
+
+export function* combinations<T>(items: T[][]): Generator<T[]> {
+  const remainder = items.length > 1 ? combinations(items.slice(1)) : [[]];
+
+  for (const r of remainder) {
+    for (const h of items.at(0)!) {
+      yield [h, ...r];
+    }
+  }
+}
