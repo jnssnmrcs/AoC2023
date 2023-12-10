@@ -1,25 +1,30 @@
 import { Point } from './util.ts';
 
+export type PipeSymbol = '|' | '-' | 'L' | 'J' | '7' | 'F';
 export type CardinalDirection = 'north' | 'south' | 'east' | 'west';
-export type GridPipe = [CardinalDirection, CardinalDirection];
+export type GridPipe = [CardinalDirection, CardinalDirection, PipeSymbol];
 export type GridCell = GridPipe | 'ground';
 export type Grid = GridCell[][];
 
 export const gridCellMap: Record<string, GridCell> = {
-  '|': ['north', 'south'],
-  '-': ['east', 'west'],
-  'L': ['north', 'east'],
-  'J': ['north', 'west'],
-  '7': ['south', 'west'],
-  'F': ['south', 'east'],
+  '|': ['north', 'south', '|'],
+  '-': ['east', 'west', '-'],
+  'L': ['north', 'east', 'L'],
+  'J': ['north', 'west', 'J'],
+  '7': ['south', 'west', '7'],
+  'F': ['south', 'east', 'F'],
   '.': 'ground',
   'S': 'ground',
 };
 
-export function parseInput(input: string): [grid: Grid, start: Point] {
+export function parseInput(
+  input: string,
+): [grid: Grid, start: Point, width: number, height: number] {
   const grid: GridCell[][] = [];
-  let start: Point | undefined;
   const lines = input.split(/\r?\n/);
+  const height = lines.length;
+  const width = lines[0].length;
+  let start: Point | undefined;
 
   for (const [y, line] of lines.entries()) {
     for (let x = 0; x < line.length; x++) {
@@ -39,7 +44,7 @@ export function parseInput(input: string): [grid: Grid, start: Point] {
     throw new Error('Could not find start position');
   }
 
-  return [grid, start];
+  return [grid, start, width, height];
 }
 
 const moveNorth = (from: Point) => ({
@@ -58,7 +63,7 @@ const moveWest = (from: Point) => ({
   ...from,
   x: from.x - 1,
 });
-const getCell = (grid: Grid, { x, y }: Point): GridCell | undefined =>
+export const getCell = (grid: Grid, { x, y }: Point): GridCell | undefined =>
   grid[x]?.[y];
 const movePosition = (position: Point, direction: CardinalDirection) => {
   switch (direction) {
@@ -84,17 +89,8 @@ const getOppositeDirection = (direction: CardinalDirection) => {
       return 'east';
   }
 };
-const positionsConnected = (grid: Grid, a: Point, b: Point) => {
-  const cellA = getCell(grid, a);
-  const cellB = getCell(grid, b);
-
-  return cellA && cellB && cellsConnected(cellA, cellB);
-};
-const cellsConnected = (a: GridCell, b: GridCell) =>
-  a !== 'ground' && b !== 'ground' &&
-  a.some((direction) => b.includes(getOppositeDirection(direction)));
-const pointString = ({ x, y }: Point) => `(${x},${y})`;
-const pointsEqual = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
+export const pointString = ({ x, y }: Point) => `(${x},${y})`;
+export const pointsEqual = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
 
 export function getCycle(
   grid: Grid,
@@ -114,18 +110,18 @@ export function getCycle(
     const [directionA, directionB] = currentCell;
     const positionA = movePosition(current, directionA);
     const positionB = movePosition(current, directionB);
-    const nextPosition = visited.has(pointString(positionA))
-      ? positionB
-      : positionA;
+    const cellA = getCell(grid, positionA);
+    const cellB = getCell(grid, positionB);
+    const cellAConnected = cellA?.includes(getOppositeDirection(directionA));
+    const cellBConnected = cellB?.includes(getOppositeDirection(directionB));
+    const bothVisited = visited.has(pointString(positionA)) &&
+      visited.has(pointString(positionB));
 
-    // Both ends of pipe is visited
-    if (visited.has(pointString(nextPosition))) {
+    if (bothVisited) {
       // If one of them is the start position and it's connected, we have a cycle
       if (
-        (pointsEqual(positionA, start) &&
-          positionsConnected(grid, positionA, start)) ||
-        (pointsEqual(positionB, start) &&
-          positionsConnected(grid, positionB, start))
+        (pointsEqual(positionA, start) && cellAConnected) ||
+        (pointsEqual(positionB, start) && cellBConnected)
       ) {
         return path;
       }
@@ -133,9 +129,18 @@ export function getCycle(
       return;
     }
 
+    const nextDirection = visited.has(pointString(positionA))
+      ? directionB
+      : directionA;
+    const nextPosition = visited.has(pointString(positionA))
+      ? positionB
+      : positionA;
     const nextCell = getCell(grid, nextPosition);
+    const nextCellConnected = nextCell?.includes(
+      getOppositeDirection(nextDirection),
+    );
 
-    if (!nextCell || !cellsConnected(currentCell, nextCell)) {
+    if (!nextCell || !nextCellConnected) {
       return;
     }
 
@@ -149,8 +154,9 @@ export function getCycle(
 export function findCycle(grid: Grid, start: Point) {
   for (const pipe of Object.keys(gridCellMap)) {
     if (pipe === '.' || pipe === 'S') continue;
+    const newCell = gridCellMap[pipe];
 
-    grid[start.x][start.y] = gridCellMap[pipe];
+    grid[start.x][start.y] = newCell;
 
     const cycle = getCycle(grid, start);
 
@@ -161,11 +167,12 @@ export function findCycle(grid: Grid, start: Point) {
 }
 
 export function main(input: string) {
-  const cycle = findCycle(...parseInput(input));
+  const [grid, start] = parseInput(input);
+  const cycle = findCycle(grid, start);
 
-  if (cycle) {
-    return cycle.length / 2;
+  if (!cycle) {
+    throw new Error('Found no cycle');
   }
 
-  throw new Error('Found no cycle');
+  return cycle.length / 2;
 }
