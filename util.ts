@@ -132,3 +132,15 @@ export function* combinations<T>(items: T[][]): Generator<T[]> {
     }
   }
 }
+
+export function* pairs<T>(array: T[]) {
+  for (let i = 0; i < array.length - 1; i++) {
+    for (let j = i; j < array.length - 1; j++) {
+      yield [array[i], array[j + 1]];
+    }
+  }
+}
+
+export function manhattanDistance(a: Point, b: Point) {
+  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
