@@ -31,7 +31,7 @@
         "--inspect-wait",
         "--allow-all"
       ],
-      "args": ["10"],
+      "args": ["12"],
       "attachSimplePort": 9229
     },
     {
