@@ -1,6 +1,5 @@
-import { findGalaxies, parseInput } from './11.1.ts';
-import { pairs } from './util.ts';
-import { manhattanDistance } from './util.ts';
+import { findGalaxies } from './11.1.ts';
+import { manhattanDistance, pairs, parseGrid } from './util.ts';
 
 function emptyRows(grid: string[][], width: number, from: number, to: number) {
   let count = 0;
@@ -39,7 +38,7 @@ function emptyColumns(
 }
 
 export function main(input: string) {
-  const [grid, width, height] = parseInput(input);
+  const [grid, width, height] = parseGrid(input);
   const galaxies = findGalaxies(grid, width, height);
   let sum = 0;
 

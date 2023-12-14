@@ -1,12 +1,12 @@
 import { pointString } from './10.1.ts';
-import { parseInput } from './11.1.ts';
 import { Line } from './13.1.ts';
+import { parseGrid } from './util.ts';
 
 export function main(input: string) {
   const patterns = input.split(/\r?\n\r?\n/g);
 
   return patterns.reduce((sum, pattern) => {
-    const [grid, width, height] = parseInput(pattern);
+    const [grid, width, height] = parseGrid(pattern);
     let horizontalReflections: Line[] = Array.from(
       { length: height - 1 },
       (_, i) => [i, i + 1],

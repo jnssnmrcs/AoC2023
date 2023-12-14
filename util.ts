@@ -144,3 +144,36 @@ export function* pairs<T>(array: T[]) {
 export function manhattanDistance(a: Point, b: Point) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
+
+export function parseGrid(input: string): [string[][], number, number] {
+  const lines = input.split(/\r?\n/);
+  const grid: string[][] = [];
+  const height = lines.length;
+  const width = lines[0].length;
+
+  for (const [y, line] of lines.entries()) {
+    let x = 0;
+
+    for (const character of line) {
+      if (!grid[x]) {
+        grid[x] = [];
+      }
+
+      grid[x][y] = character;
+
+      x++;
+    }
+  }
+
+  return [grid, width, height];
+}
+
+export function printGrid(grid: string[][], width: number, height: number) {
+  for (let y = 0; y < height; y++) {
+    let line = '';
+    for (let x = 0; x < width; x++) {
+      line += grid[x][y];
+    }
+    console.log(line);
+  }
+}
