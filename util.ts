@@ -177,3 +177,15 @@ export function printGrid(grid: string[][], width: number, height: number) {
     console.log(line);
   }
 }
+
+export function gridToString(grid: string[][], width: number, height: number) {
+  let str = '';
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      str += grid[x][y];
+    }
+  }
+
+  return str;
+}
